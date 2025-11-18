@@ -1,0 +1,168 @@
+{
+  "puppet_task_version": 1,
+  "supports_noop": false,
+  "description": "Execute the entire Ansible role imperatively",
+  "input_method": "environment",
+  "parameters": {
+    "filebeat_version": {
+      "description": "Ansible role variable (default: 7.x)",
+      "type": "Optional[String]"
+    },
+    "filebeat_name": {
+      "description": "",
+      "type": "Optional[String]"
+    },
+    "filebeat_ssl_certs_dir": {
+      "description": "Ansible role variable (default: /etc/pki/logstash)",
+      "type": "Optional[String]"
+    },
+    "filebeat_ssl_private_dir": {
+      "description": "Ansible role variable (default: {{ filebeat_ssl_certs_dir }})",
+      "type": "Optional[String]"
+    },
+    "filebeat_ssl_insecure": {
+      "description": "Ansible role variable (default: false)",
+      "type": "Optional[String]"
+    },
+    "filebeat_log_level": {
+      "description": "Ansible role variable (default: warning)",
+      "type": "Optional[String]"
+    },
+    "filebeat_log_dir": {
+      "description": "Ansible role variable (default: /var/log/mybeat)",
+      "type": "Optional[String]"
+    },
+    "filebeat_log_filename": {
+      "description": "Ansible role variable (default: mybeat.log)",
+      "type": "Optional[String]"
+    },
+    "filebeat_elastic_cloud_id": {
+      "description": "Ansible role variable (default: )",
+      "type": "Optional[String]"
+    },
+    "filebeat_elastic_cloud_username": {
+      "description": "Ansible role variable (default: )",
+      "type": "Optional[String]"
+    },
+    "filebeat_elastic_cloud_password": {
+      "description": "Ansible role variable (default: )",
+      "type": "Optional[String]"
+    },
+    "filebeat_package": {
+      "description": "Ansible role variable (default: filebeat)",
+      "type": "Optional[String]"
+    },
+    "filebeat_package_state": {
+      "description": "Ansible role variable (default: present)",
+      "type": "Optional[String]"
+    },
+    "filebeat_create_config": {
+      "description": "Ansible role variable (default: true)",
+      "type": "Optional[Boolean]"
+    },
+    "filebeat_template": {
+      "description": "Ansible role variable (default: filebeat.yml.j2)",
+      "type": "Optional[String]"
+    },
+    "filebeat_inputs": {
+      "description": "Ansible role variable (default: [{\"type\"=>\"log\", \"paths\"=>[\"/var/log/*.log\"]}])",
+      "type": "Optional[Array]"
+    },
+    "filebeat_output_elasticsearch_enabled": {
+      "description": "",
+      "type": "Optional[Boolean]"
+    },
+    "filebeat_output_elasticsearch_hosts": {
+      "description": "Ansible role variable (default: [\"localhost:9200\"])",
+      "type": "Optional[Array]"
+    },
+    "filebeat_output_elasticsearch_auth": {
+      "description": "Ansible role variable (default: {})",
+      "type": "Optional[Hash]"
+    },
+    "filebeat_output_logstash_enabled": {
+      "description": "Ansible role variable (default: true)",
+      "type": "Optional[Boolean]"
+    },
+    "filebeat_output_logstash_hosts": {
+      "description": "Ansible role variable (default: [\"localhost:5044\"])",
+      "type": "Optional[Array]"
+    },
+    "filebeat_enable_logging": {
+      "description": "",
+      "type": "Optional[Boolean]"
+    },
+    "filebeat_ssl_ca_file": {
+      "description": "Ansible role variable (default: )",
+      "type": "Optional[String]"
+    },
+    "filebeat_ssl_certificate_file": {
+      "description": "Ansible role variable (default: )",
+      "type": "Optional[String]"
+    },
+    "filebeat_ssl_key_file": {
+      "description": "Ansible role variable (default: )",
+      "type": "Optional[String]"
+    },
+    "filebeat_ssl_copy_files": {
+      "description": "Ansible role variable (default: true)",
+      "type": "Optional[Boolean]"
+    },
+    "filebeat_elastic_cloud_enabled": {
+      "description": "",
+      "type": "Optional[Boolean]"
+    },
+    "par_tags": {
+      "description": "An array of Ansible tags to execute (optional)",
+      "type": "Optional[Array[String]]"
+    },
+    "par_skip_tags": {
+      "description": "An array of Ansible tags to skip (optional)",
+      "type": "Optional[Array[String]]"
+    },
+    "par_start_at_task": {
+      "description": "The name of the task to start execution at (optional)",
+      "type": "Optional[String]"
+    },
+    "par_limit": {
+      "description": "Limit playbook execution to specific hosts (optional)",
+      "type": "Optional[String]"
+    },
+    "par_verbose": {
+      "description": "Enable verbose output from Ansible (optional)",
+      "type": "Optional[Boolean]"
+    },
+    "par_check_mode": {
+      "description": "Run Ansible in check mode (dry-run) (optional)",
+      "type": "Optional[Boolean]"
+    },
+    "par_timeout": {
+      "description": "Timeout in seconds for playbook execution (optional)",
+      "type": "Optional[Integer]"
+    },
+    "par_user": {
+      "description": "Remote user to use for Ansible connections (optional)",
+      "type": "Optional[String]"
+    },
+    "par_env_vars": {
+      "description": "Additional environment variables for ansible-playbook execution (optional)",
+      "type": "Optional[Hash]"
+    }
+  },
+  "implementations": [
+    {
+      "name": "paw_ansible_role_filebeat.sh",
+      "requirements": [
+        "shell"
+      ],
+      "input_method": "environment"
+    },
+    {
+      "name": "paw_ansible_role_filebeat.ps1",
+      "requirements": [
+        "powershell"
+      ],
+      "input_method": "environment"
+    }
+  ]
+}
