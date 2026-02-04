@@ -28,6 +28,7 @@
 # @param filebeat_ssl_key_file
 # @param filebeat_ssl_copy_files
 # @param filebeat_elastic_cloud_enabled
+# @param par_vardir Base directory for Puppet agent cache (uses lookup('paw::par_vardir') for common config)
 # @param par_tags An array of Ansible tags to execute (optional)
 # @param par_skip_tags An array of Ansible tags to skip (optional)
 # @param par_start_at_task The name of the task to start execution at (optional)
@@ -55,7 +56,7 @@ class paw_ansible_role_filebeat (
   String $filebeat_package_state = 'present',
   Boolean $filebeat_create_config = true,
   String $filebeat_template = 'filebeat.yml.j2',
-  Array $filebeat_inputs = [{ 'type' => 'log', 'paths' => ['/var/log/*.log'] }],
+  Array $filebeat_inputs = [{'type' => 'log', 'paths' => ['/var/log/*.log']}],
   Boolean $filebeat_output_elasticsearch_enabled = false,
   Array $filebeat_output_elasticsearch_hosts = ['localhost:9200'],
   Hash $filebeat_output_elasticsearch_auth = {},
@@ -67,6 +68,7 @@ class paw_ansible_role_filebeat (
   Optional[String] $filebeat_ssl_key_file = undef,
   Boolean $filebeat_ssl_copy_files = true,
   Boolean $filebeat_elastic_cloud_enabled = false,
+  Optional[Stdlib::Absolutepath] $par_vardir = undef,
   Optional[Array[String]] $par_tags = undef,
   Optional[Array[String]] $par_skip_tags = undef,
   Optional[String] $par_start_at_task = undef,
@@ -80,57 +82,56 @@ class paw_ansible_role_filebeat (
   Optional[Boolean] $par_exclusive = undef
 ) {
 # Execute the Ansible role using PAR (Puppet Ansible Runner)
-  $vardir = $facts['puppet_vardir'] ? {
-    undef   => $settings::vardir ? {
-      undef   => '/opt/puppetlabs/puppet/cache',
-      default => $settings::vardir,
-    },
-    default => $facts['puppet_vardir'],
-  }
-  $playbook_path = "${vardir}/lib/puppet_x/ansible_modules/ansible_role_filebeat/playbook.yml"
+# Playbook synced via pluginsync to agent's cache directory
+# Check for common paw::par_vardir setting, then module-specific, then default
+$_par_vardir = $par_vardir ? {
+  undef   => lookup('paw::par_vardir', Stdlib::Absolutepath, 'first', '/opt/puppetlabs/puppet/cache'),
+  default => $par_vardir,
+}
+$playbook_path = "${_par_vardir}/lib/puppet_x/ansible_modules/ansible_role_filebeat/playbook.yml"
 
-  par { 'paw_ansible_role_filebeat-main':
-    ensure        => present,
-    playbook      => $playbook_path,
-    playbook_vars => {
-      'filebeat_version'                      => $filebeat_version,
-      'filebeat_name'                         => $filebeat_name,
-      'filebeat_ssl_certs_dir'                => $filebeat_ssl_certs_dir,
-      'filebeat_ssl_private_dir'              => $filebeat_ssl_private_dir,
-      'filebeat_ssl_insecure'                 => $filebeat_ssl_insecure,
-      'filebeat_log_level'                    => $filebeat_log_level,
-      'filebeat_log_dir'                      => $filebeat_log_dir,
-      'filebeat_log_filename'                 => $filebeat_log_filename,
-      'filebeat_elastic_cloud_id'             => $filebeat_elastic_cloud_id,
-      'filebeat_elastic_cloud_username'       => $filebeat_elastic_cloud_username,
-      'filebeat_elastic_cloud_password'       => $filebeat_elastic_cloud_password,
-      'filebeat_package'                      => $filebeat_package,
-      'filebeat_package_state'                => $filebeat_package_state,
-      'filebeat_create_config'                => $filebeat_create_config,
-      'filebeat_template'                     => $filebeat_template,
-      'filebeat_inputs'                       => $filebeat_inputs,
-      'filebeat_output_elasticsearch_enabled' => $filebeat_output_elasticsearch_enabled,
-      'filebeat_output_elasticsearch_hosts'   => $filebeat_output_elasticsearch_hosts,
-      'filebeat_output_elasticsearch_auth'    => $filebeat_output_elasticsearch_auth,
-      'filebeat_output_logstash_enabled'      => $filebeat_output_logstash_enabled,
-      'filebeat_output_logstash_hosts'        => $filebeat_output_logstash_hosts,
-      'filebeat_enable_logging'               => $filebeat_enable_logging,
-      'filebeat_ssl_ca_file'                  => $filebeat_ssl_ca_file,
-      'filebeat_ssl_certificate_file'         => $filebeat_ssl_certificate_file,
-      'filebeat_ssl_key_file'                 => $filebeat_ssl_key_file,
-      'filebeat_ssl_copy_files'               => $filebeat_ssl_copy_files,
-      'filebeat_elastic_cloud_enabled'        => $filebeat_elastic_cloud_enabled,
-    },
-    tags          => $par_tags,
-    skip_tags     => $par_skip_tags,
-    start_at_task => $par_start_at_task,
-    limit         => $par_limit,
-    verbose       => $par_verbose,
-    check_mode    => $par_check_mode,
-    timeout       => $par_timeout,
-    user          => $par_user,
-    env_vars      => $par_env_vars,
-    logoutput     => $par_logoutput,
-    exclusive     => $par_exclusive,
-  }
+par { 'paw_ansible_role_filebeat-main':
+  ensure        => present,
+  playbook      => $playbook_path,
+  playbook_vars => {
+        'filebeat_version' => $filebeat_version,
+        'filebeat_name' => $filebeat_name,
+        'filebeat_ssl_certs_dir' => $filebeat_ssl_certs_dir,
+        'filebeat_ssl_private_dir' => $filebeat_ssl_private_dir,
+        'filebeat_ssl_insecure' => $filebeat_ssl_insecure,
+        'filebeat_log_level' => $filebeat_log_level,
+        'filebeat_log_dir' => $filebeat_log_dir,
+        'filebeat_log_filename' => $filebeat_log_filename,
+        'filebeat_elastic_cloud_id' => $filebeat_elastic_cloud_id,
+        'filebeat_elastic_cloud_username' => $filebeat_elastic_cloud_username,
+        'filebeat_elastic_cloud_password' => $filebeat_elastic_cloud_password,
+        'filebeat_package' => $filebeat_package,
+        'filebeat_package_state' => $filebeat_package_state,
+        'filebeat_create_config' => $filebeat_create_config,
+        'filebeat_template' => $filebeat_template,
+        'filebeat_inputs' => $filebeat_inputs,
+        'filebeat_output_elasticsearch_enabled' => $filebeat_output_elasticsearch_enabled,
+        'filebeat_output_elasticsearch_hosts' => $filebeat_output_elasticsearch_hosts,
+        'filebeat_output_elasticsearch_auth' => $filebeat_output_elasticsearch_auth,
+        'filebeat_output_logstash_enabled' => $filebeat_output_logstash_enabled,
+        'filebeat_output_logstash_hosts' => $filebeat_output_logstash_hosts,
+        'filebeat_enable_logging' => $filebeat_enable_logging,
+        'filebeat_ssl_ca_file' => $filebeat_ssl_ca_file,
+        'filebeat_ssl_certificate_file' => $filebeat_ssl_certificate_file,
+        'filebeat_ssl_key_file' => $filebeat_ssl_key_file,
+        'filebeat_ssl_copy_files' => $filebeat_ssl_copy_files,
+        'filebeat_elastic_cloud_enabled' => $filebeat_elastic_cloud_enabled
+              },
+  tags          => $par_tags,
+  skip_tags     => $par_skip_tags,
+  start_at_task => $par_start_at_task,
+  limit         => $par_limit,
+  verbose       => $par_verbose,
+  check_mode    => $par_check_mode,
+  timeout       => $par_timeout,
+  user          => $par_user,
+  env_vars      => $par_env_vars,
+  logoutput     => $par_logoutput,
+  exclusive     => $par_exclusive,
+}
 }
